@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
-import argparse
 import sys
 from pathlib import Path
+
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+import argparse
 
 from rfdetr import RFDETR
 from rfdetr.training import RFDETRDataModule, RFDETRModelModule, build_trainer
@@ -13,8 +17,7 @@ from rfdetr_tools.checkpoints import resolve_checkpoint
 from rfdetr_tools.config import load_run_context, validate_dataset_dir
 
 
-def add_parser(subparsers: argparse._SubParsersAction) -> None:
-    parser = subparsers.add_parser("eval", help="Run COCO validation or test metrics on a checkpoint.")
+def configure_parser(parser: argparse.ArgumentParser) -> None:
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--checkpoint", type=Path)
     source.add_argument("--train-output-dir", type=Path)
@@ -22,6 +25,11 @@ def add_parser(subparsers: argparse._SubParsersAction) -> None:
     parser.add_argument("--split", choices=("valid", "test"), default="valid")
     parser.add_argument("--device", type=str, default="cuda", choices=("cuda", "cpu", "mps"))
     parser.set_defaults(func=run)
+
+
+def add_parser(subparsers: argparse._SubParsersAction) -> None:
+    parser = subparsers.add_parser("eval", help="Run COCO validation or test metrics on a checkpoint.")
+    configure_parser(parser)
 
 
 def run(args: argparse.Namespace) -> None:
@@ -67,3 +75,9 @@ def run(args: argparse.Namespace) -> None:
         trainer.validate(module, datamodule)
     else:
         trainer.test(module, datamodule)
+
+
+if __name__ == "__main__":
+    from rfdetr_tools._run import script_main
+
+    script_main(configure_parser, description="Run COCO validation or test metrics on a checkpoint.")

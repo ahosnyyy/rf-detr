@@ -2,7 +2,7 @@
 #
 # Tuned for NVIDIA RTX 5090 (32 GB GDDR7) + RFDETRLarge @ 704px.
 # Refine batch size on your machine:
-#   python -m rfdetr_tools fit-gpu --config configs/template.yaml --targets 16,32,64
+#   python rfdetr_tools/fit_gpu.py --config configs/template.yaml --targets 16,32,64
 #
 # model.variant options: RFDETRNano, RFDETRSmall, RFDETRMedium, RFDETRLarge
 # aug_preset options: conservative, aggressive, aerial, industrial

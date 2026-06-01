@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
-import argparse
 import sys
 from pathlib import Path
+
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+import argparse
 from typing import Any
 
 from rfdetr_tools.config import (
@@ -34,7 +38,7 @@ def _print_run_info(
 ) -> None:
     print(f"Output directory: {output_dir}")
     if tensorboard:
-        print(f"TensorBoard: python -m rfdetr_tools log --output-dir {output_dir.as_posix()}")
+        print(f"TensorBoard: python rfdetr_tools/log.py --output-dir {output_dir.as_posix()} --tensorboard")
     if progress_bar is None:
         print("Terminal progress: disabled")
     else:
@@ -44,8 +48,7 @@ def _print_run_info(
         print(f"Console log: {log_file}")
 
 
-def add_parser(subparsers: argparse._SubParsersAction) -> None:
-    parser = subparsers.add_parser("train", help="Fine-tune an RF-DETR model.")
+def configure_parser(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--config", type=Path, help="YAML training config file.")
     parser.add_argument("--model", type=str, default=None, help="Model variant (e.g. RFDETRSmall).")
     parser.add_argument("--dataset-dir", type=Path, default=None, help="RF-DETR COCO dataset directory.")
@@ -77,6 +80,11 @@ def add_parser(subparsers: argparse._SubParsersAction) -> None:
         help="Mirror console output to a file in the output dir (default: train.log).",
     )
     parser.set_defaults(func=run)
+
+
+def add_parser(subparsers: argparse._SubParsersAction) -> None:
+    parser = subparsers.add_parser("train", help="Fine-tune an RF-DETR model.")
+    configure_parser(parser)
 
 
 def _merge_config(args: argparse.Namespace) -> dict[str, Any]:
@@ -162,3 +170,9 @@ def run(args: argparse.Namespace) -> None:
             model.train(**train_kwargs)
     else:
         model.train(**train_kwargs)
+
+
+if __name__ == "__main__":
+    from rfdetr_tools._run import script_main
+
+    script_main(configure_parser, description="Fine-tune an RF-DETR model.")

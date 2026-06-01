@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 import argparse
 import csv
 import subprocess
-import sys
-from pathlib import Path
 
 
 def _print_metrics_summary(metrics_csv: Path, *, tail: int = 5) -> None:
@@ -56,8 +60,7 @@ def _print_log_tail(log_path: Path, *, tail: int = 20) -> None:
         print(f"  {line}")
 
 
-def add_parser(subparsers: argparse._SubParsersAction) -> None:
-    parser = subparsers.add_parser("log", help="Inspect metrics or launch TensorBoard.")
+def configure_parser(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--output-dir", type=Path, required=True, help="Training output directory.")
     parser.add_argument("--tensorboard", action="store_true", help="Launch TensorBoard for the run.")
     parser.add_argument("--port", type=int, default=6006)
@@ -65,6 +68,11 @@ def add_parser(subparsers: argparse._SubParsersAction) -> None:
     parser.add_argument("--summary", action="store_true", help="Print a metrics.csv summary.")
     parser.add_argument("--tail-log", type=int, default=0, help="Print the last N lines of train.log.")
     parser.set_defaults(func=run)
+
+
+def add_parser(subparsers: argparse._SubParsersAction) -> None:
+    parser = subparsers.add_parser("log", help="Inspect metrics or launch TensorBoard.")
+    configure_parser(parser)
 
 
 def run(args: argparse.Namespace) -> None:
@@ -101,3 +109,9 @@ def run(args: argparse.Namespace) -> None:
     ]
     print(f"Launching TensorBoard at http://{args.host}:{args.port}")
     raise SystemExit(subprocess.call(cmd))
+
+
+if __name__ == "__main__":
+    from rfdetr_tools._run import script_main
+
+    script_main(configure_parser, description="Inspect metrics or launch TensorBoard.")

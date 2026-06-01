@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 import argparse
 import json
-import sys
 from dataclasses import asdict, dataclass
-from pathlib import Path
 from typing import Any
 
 import torch
@@ -205,11 +209,7 @@ def _print_results(scenarios: list[ProbeScenario], best: ProbeScenario | None) -
     ).strip())
 
 
-def add_parser(subparsers: argparse._SubParsersAction) -> None:
-    parser = subparsers.add_parser(
-        "fit-gpu",
-        help="Sweep batch size / grad accumulation and find GPU-safe training settings.",
-    )
+def configure_parser(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--config", type=Path, help="Base YAML config (model, dataset, aug, etc.).")
     parser.add_argument("--dataset-dir", type=Path, default=None)
     parser.add_argument("--model", type=str, default=None, help="Override model variant from config.")
@@ -245,6 +245,14 @@ def add_parser(subparsers: argparse._SubParsersAction) -> None:
         help="Start training immediately with the best settings.",
     )
     parser.set_defaults(func=run)
+
+
+def add_parser(subparsers: argparse._SubParsersAction) -> None:
+    parser = subparsers.add_parser(
+        "fit-gpu",
+        help="Sweep batch size / grad accumulation and find GPU-safe training settings.",
+    )
+    configure_parser(parser)
 
 
 def run(args: argparse.Namespace) -> None:
@@ -315,3 +323,9 @@ def run(args: argparse.Namespace) -> None:
         train_kwargs["device"] = "cuda"
         model = model_cls(**model_kwargs)
         model.train(**train_kwargs)
+
+
+if __name__ == "__main__":
+    from rfdetr_tools._run import script_main
+
+    script_main(configure_parser, description="Probe GPU-safe training batch settings.")

@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 import argparse
 import json
-import sys
 from copy import deepcopy
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 import torch
@@ -125,8 +129,7 @@ def write_metadata(
     return metadata_path
 
 
-def add_parser(subparsers: argparse._SubParsersAction) -> None:
-    parser = subparsers.add_parser("export", help="Export a checkpoint to ONNX and/or TorchScript.")
+def configure_parser(parser: argparse.ArgumentParser) -> None:
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--checkpoint", type=Path)
     source.add_argument("--train-output-dir", type=Path)
@@ -140,6 +143,11 @@ def add_parser(subparsers: argparse._SubParsersAction) -> None:
     parser.add_argument("--sample-image", type=Path, default=None)
     parser.add_argument("--torchscript-name", type=str, default=None)
     parser.set_defaults(func=run)
+
+
+def add_parser(subparsers: argparse._SubParsersAction) -> None:
+    parser = subparsers.add_parser("export", help="Export a checkpoint to ONNX and/or TorchScript.")
+    configure_parser(parser)
 
 
 def run(args: argparse.Namespace) -> None:
@@ -211,3 +219,9 @@ def run(args: argparse.Namespace) -> None:
         torchscript_path=torchscript_path,
     )
     print(f"Metadata: {metadata_path}")
+
+
+if __name__ == "__main__":
+    from rfdetr_tools._run import script_main
+
+    script_main(configure_parser, description="Export a checkpoint to ONNX and/or TorchScript.")

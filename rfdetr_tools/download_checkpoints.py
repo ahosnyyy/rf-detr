@@ -2,8 +2,13 @@
 
 from __future__ import annotations
 
-import argparse
+import sys
 from pathlib import Path
+
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+import argparse
 
 from rfdetr_tools.checkpoints import (
     VARIANT_DEFAULT_WEIGHTS,
@@ -13,11 +18,7 @@ from rfdetr_tools.checkpoints import (
 )
 
 
-def add_parser(subparsers: argparse._SubParsersAction) -> None:
-    parser = subparsers.add_parser(
-        "download-checkpoints",
-        help="Download pretrained weights into the project checkpoints/ directory.",
-    )
+def configure_parser(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--weights",
         type=str,
@@ -44,6 +45,14 @@ def add_parser(subparsers: argparse._SubParsersAction) -> None:
     parser.set_defaults(func=run)
 
 
+def add_parser(subparsers: argparse._SubParsersAction) -> None:
+    parser = subparsers.add_parser(
+        "download-checkpoints",
+        help="Download pretrained weights into the project checkpoints/ directory.",
+    )
+    configure_parser(parser)
+
+
 def run(args: argparse.Namespace) -> None:
     targets: list[str] = []
     if args.all:
@@ -67,3 +76,9 @@ def run(args: argparse.Namespace) -> None:
     for name in targets:
         path = ensure_pretrained_weights(name, redownload=args.redownload)
         print(f"Ready: {path}")
+
+
+if __name__ == "__main__":
+    from rfdetr_tools._run import script_main
+
+    script_main(configure_parser, description="Download pretrained RF-DETR weights.")

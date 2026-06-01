@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
-import argparse
 import sys
 from pathlib import Path
+
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+import argparse
 
 import torch
 from PIL import Image
@@ -163,8 +167,7 @@ def _report_and_save(
     print(f"Saved: {output_path}")
 
 
-def add_parser(subparsers: argparse._SubParsersAction) -> None:
-    parser = subparsers.add_parser("infer", help="Run detection on image(s) with PyTorch, ONNX, or TorchScript.")
+def configure_parser(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("input", type=Path, help="Input image or directory.")
     parser.add_argument("--backend", choices=("pytorch", "onnx", "torchscript"), default="pytorch")
     parser.add_argument("--checkpoint", type=Path, default=None)
@@ -176,6 +179,11 @@ def add_parser(subparsers: argparse._SubParsersAction) -> None:
     parser.add_argument("--output", type=Path, default=None, help="Output image or directory for annotated results.")
     parser.add_argument("--no-display", action="store_true")
     parser.set_defaults(func=run)
+
+
+def add_parser(subparsers: argparse._SubParsersAction) -> None:
+    parser = subparsers.add_parser("infer", help="Run detection on image(s) with PyTorch, ONNX, or TorchScript.")
+    configure_parser(parser)
 
 
 def run(args: argparse.Namespace) -> None:
@@ -192,3 +200,9 @@ def run(args: argparse.Namespace) -> None:
     except ImportError as exc:
         print(str(exc), file=sys.stderr)
         raise SystemExit(1) from exc
+
+
+if __name__ == "__main__":
+    from rfdetr_tools._run import script_main
+
+    script_main(configure_parser, description="Run detection on image(s).")
