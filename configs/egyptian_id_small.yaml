@@ -1,5 +1,5 @@
 # OOM on 4 GB GPU? Run a GPU fit sweep first:
-#   uv run rfdetr-tools fit-gpu --config configs/egyptian_id_small.yaml --output-config configs/egyptian_id_small_fitted.yaml
+#   python -m rfdetr_tools fit-gpu --config configs/egyptian_id_small.yaml --output-config configs/egyptian_id_small_fitted.yaml
 # Or set batch_size: auto below (probed once at train time; fit-gpu tries more combinations).
 
 model:
@@ -34,4 +34,4 @@ project: egyptian-id-detection
 # run_test: true
 
 # OOM on 4 GB GPU? Set gradient_checkpointing: true under model:, run fit-gpu, or:
-#   uv run rfdetr-tools train --config configs/egyptian_id_small.yaml --gradient-checkpointing
+#   python -m rfdetr_tools train --config configs/egyptian_id_small.yaml --gradient-checkpointing

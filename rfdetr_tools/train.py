@@ -34,7 +34,7 @@ def _print_run_info(
 ) -> None:
     print(f"Output directory: {output_dir}")
     if tensorboard:
-        print(f"TensorBoard: rfdetr-tools log --output-dir {output_dir.as_posix()}")
+        print(f"TensorBoard: python -m rfdetr_tools log --output-dir {output_dir.as_posix()}")
     if progress_bar is None:
         print("Terminal progress: disabled")
     else:
@@ -137,15 +137,15 @@ def run(args: argparse.Namespace) -> None:
     log_file = resolve_log_file(config.pop("log_file", None), output_dir)
     use_tensorboard = config.get("tensorboard", True)
     if use_tensorboard:
-        use_tensorboard = _check_logger("tensorboard", "tensorboard", "Install with: uv pip install tensorboard")
+        use_tensorboard = _check_logger("tensorboard", "tensorboard", "Install with: pip install tensorboard")
     config["tensorboard"] = use_tensorboard
 
     if config.get("wandb"):
-        if not _check_logger("wandb", "wandb", 'Install with: uv pip install "rfdetr[loggers]"'):
+        if not _check_logger("wandb", "wandb", 'Install with: pip install "rfdetr[loggers]"'):
             config["wandb"] = False
 
     if config.get("mlflow"):
-        if not _check_logger("mlflow", "mlflow", 'Install with: uv pip install "rfdetr[loggers]"'):
+        if not _check_logger("mlflow", "mlflow", 'Install with: pip install "rfdetr[loggers]"'):
             config["mlflow"] = False
 
     progress_bar = config.get("progress_bar", "tqdm")

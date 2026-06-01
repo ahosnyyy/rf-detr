@@ -26,7 +26,7 @@ BEST_CHECKPOINT_NAMES = (
 def find_project_root(start: Path | None = None) -> Path:
     start = (start or Path.cwd()).resolve()
     for path in (start, *start.parents):
-        if (path / "pyproject.toml").is_file():
+        if (path / "rfdetr_tools").is_dir() and (path / "requirements.txt").is_file():
             return path
     return start
 

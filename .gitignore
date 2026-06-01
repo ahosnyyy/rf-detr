@@ -12,9 +12,6 @@ build/
 .eggs/
 pip-wheel-metadata/
 
-# uv
-.uv/
-
 # Test / lint / type check
 .pytest_cache/
 .mypy_cache/

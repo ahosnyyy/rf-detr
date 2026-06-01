@@ -85,7 +85,7 @@ def run(args: argparse.Namespace) -> None:
     try:
         import tensorboard  # noqa: F401
     except ModuleNotFoundError:
-        print("TensorBoard is not installed. Install with: uv pip install tensorboard", file=sys.stderr)
+        print("TensorBoard is not installed. Install with: pip install tensorboard", file=sys.stderr)
         raise SystemExit(1)
 
     cmd = [

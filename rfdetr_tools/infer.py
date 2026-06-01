@@ -64,7 +64,7 @@ def run_onnx(args: argparse.Namespace, image_paths: list[Path]) -> None:
         from rfdetr.export._onnx.inference import _create_onnx_session, _run_inference
     except ImportError as exc:
         raise ImportError(
-            'ONNX inference requires rfdetr[onnx]. Install with: uv pip install "rfdetr[onnx]"'
+            'ONNX inference requires rfdetr[onnx]. Install with: pip install "rfdetr[onnx]"'
         ) from exc
 
     metadata_path = resolve_metadata_path(args.metadata, args.model)

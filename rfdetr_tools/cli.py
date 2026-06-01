@@ -15,7 +15,7 @@ from rfdetr_tools import train as train_cmd
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="rfdetr-tools",
+        prog="rfdetr_tools",
         description="Train, evaluate, export, infer, and monitor RF-DETR fine-tuning runs.",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)

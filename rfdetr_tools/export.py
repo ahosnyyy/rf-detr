@@ -25,7 +25,7 @@ def _check_onnx_deps() -> bool:
     except ModuleNotFoundError:
         print(
             "Warning: ONNX export requires rfdetr[onnx]. Install with:\n"
-            "  uv pip install \"rfdetr[onnx]\"",
+            "  pip install \"rfdetr[onnx]\"",
             file=sys.stderr,
         )
         return False
