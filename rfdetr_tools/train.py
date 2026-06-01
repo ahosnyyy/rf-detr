@@ -13,6 +13,7 @@ from rfdetr_tools.config import (
     prepare_model_kwargs,
     validate_dataset_dir,
 )
+from rfdetr_tools.console_log import resolve_log_file, tee_console_to_file
 
 
 def _check_logger(name: str, package: str, install_hint: str) -> bool:
@@ -24,7 +25,13 @@ def _check_logger(name: str, package: str, install_hint: str) -> bool:
         return False
 
 
-def _print_run_info(output_dir: Path, *, tensorboard: bool, progress_bar: str | None) -> None:
+def _print_run_info(
+    output_dir: Path,
+    *,
+    tensorboard: bool,
+    progress_bar: str | None,
+    log_file: Path | None = None,
+) -> None:
     print(f"Output directory: {output_dir}")
     if tensorboard:
         print(f"TensorBoard: rfdetr-tools log --output-dir {output_dir.as_posix()}")
@@ -33,6 +40,8 @@ def _print_run_info(output_dir: Path, *, tensorboard: bool, progress_bar: str | 
     else:
         print(f"Terminal progress: {progress_bar}")
     print(f"Metrics CSV: {output_dir / 'metrics.csv'}")
+    if log_file is not None:
+        print(f"Console log: {log_file}")
 
 
 def add_parser(subparsers: argparse._SubParsersAction) -> None:
@@ -59,6 +68,14 @@ def add_parser(subparsers: argparse._SubParsersAction) -> None:
     parser.add_argument("--devices", type=str, default=None)
     parser.add_argument("--progress-bar", type=str, default=None, choices=("tqdm", "rich", "none"))
     parser.add_argument("--no-tensorboard", action="store_true")
+    parser.add_argument(
+        "--log-file",
+        type=str,
+        default=None,
+        nargs="?",
+        const="train.log",
+        help="Mirror console output to a file in the output dir (default: train.log).",
+    )
     parser.set_defaults(func=run)
 
 
@@ -100,6 +117,9 @@ def _merge_config(args: argparse.Namespace) -> dict[str, Any]:
     elif args.progress_bar is not None:
         config["progress_bar"] = args.progress_bar
 
+    if args.log_file is not None:
+        config["log_file"] = args.log_file
+
     if "dataset_dir" not in config:
         raise ValueError("dataset_dir is required (config file or --dataset-dir).")
     if "output_dir" not in config:
@@ -114,6 +134,7 @@ def run(args: argparse.Namespace) -> None:
     validate_dataset_dir(dataset_dir)
 
     output_dir = Path(config["output_dir"]).resolve()
+    log_file = resolve_log_file(config.pop("log_file", None), output_dir)
     use_tensorboard = config.get("tensorboard", True)
     if use_tensorboard:
         use_tensorboard = _check_logger("tensorboard", "tensorboard", "Install with: uv pip install tensorboard")
@@ -133,7 +154,11 @@ def run(args: argparse.Namespace) -> None:
     print(f"Model: {model_cls.__name__}")
     if model_kwargs:
         print(f"Model options: {model_kwargs}")
-    _print_run_info(output_dir, tensorboard=use_tensorboard, progress_bar=progress_bar)
+    _print_run_info(output_dir, tensorboard=use_tensorboard, progress_bar=progress_bar, log_file=log_file)
 
     model = model_cls(**model_kwargs)
-    model.train(**train_kwargs)
+    if log_file is not None:
+        with tee_console_to_file(log_file):
+            model.train(**train_kwargs)
+    else:
+        model.train(**train_kwargs)

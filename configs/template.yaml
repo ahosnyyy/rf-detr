@@ -34,6 +34,7 @@ checkpoint_interval: 10
 
 tensorboard: true
 progress_bar: rich
+log_file: train.log  # mirror console output; metrics.csv is always written too
 
 # wandb: true
 # project: my-project

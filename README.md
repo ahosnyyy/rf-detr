@@ -154,6 +154,15 @@ uv run rfdetr-tools train --config configs/egyptian_id_small.yaml --resume outpu
 
 # W&B logging
 uv run rfdetr-tools train --config configs/egyptian_id_small.yaml --wandb --project my-project --run exp-01
+
+# Mirror console output to train.log
+uv run rfdetr-tools train --config configs/egyptian_id_small.yaml --log-file
+```
+
+Or in YAML:
+
+```yaml
+log_file: train.log   # or true for the same default name
 ```
 
 **RTX 3050 (4 GB) tips:** run `fit-gpu` first, or keep effective batch at 16 (`batch_size × grad_accum_steps`). If OOM, add `--gradient-checkpointing` or lower `--batch-size`.
@@ -163,7 +172,8 @@ Outputs per run:
 | Artifact | Description |
 |----------|-------------|
 | `checkpoint_best_*.pth` | Best weights (prefers `checkpoint_best_total`, then `regular`, then `ema`) |
-| `metrics.csv` | Per-epoch validation metrics |
+| `metrics.csv` | Per-epoch train/val metrics (always written by RF-DETR) |
+| `train.log` | Console output (optional; set `log_file:` in config or `--log-file`) |
 | `training_config.json` | Full reproducibility config |
 | TensorBoard events | Under the output directory |
 
@@ -179,10 +189,11 @@ uv run rfdetr-tools eval --train-output-dir output/egyptian_id_small --split tes
 
 ### Log
 
-Inspect metrics or launch TensorBoard:
+Inspect metrics, tail the console log, or launch TensorBoard:
 
 ```powershell
 uv run rfdetr-tools log --output-dir output/egyptian_id_small --summary
+uv run rfdetr-tools log --output-dir output/egyptian_id_small --summary --tail-log 30
 uv run rfdetr-tools log --output-dir output/egyptian_id_small --tensorboard --port 6006
 ```
 

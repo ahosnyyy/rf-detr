@@ -44,6 +44,18 @@ def _print_metrics_summary(metrics_csv: Path, *, tail: int = 5) -> None:
             print(f"  epoch {epoch}: val/mAP_50_95={map_score}")
 
 
+def _print_log_tail(log_path: Path, *, tail: int = 20) -> None:
+    if not log_path.is_file():
+        return
+    lines = log_path.read_text(encoding="utf-8", errors="replace").splitlines()
+    if not lines:
+        return
+    print(f"\nConsole log: {log_path} ({len(lines)} lines)")
+    print(f"Last {min(tail, len(lines))} lines:")
+    for line in lines[-tail:]:
+        print(f"  {line}")
+
+
 def add_parser(subparsers: argparse._SubParsersAction) -> None:
     parser = subparsers.add_parser("log", help="Inspect metrics or launch TensorBoard.")
     parser.add_argument("--output-dir", type=Path, required=True, help="Training output directory.")
@@ -51,15 +63,19 @@ def add_parser(subparsers: argparse._SubParsersAction) -> None:
     parser.add_argument("--port", type=int, default=6006)
     parser.add_argument("--host", type=str, default="127.0.0.1")
     parser.add_argument("--summary", action="store_true", help="Print a metrics.csv summary.")
+    parser.add_argument("--tail-log", type=int, default=0, help="Print the last N lines of train.log.")
     parser.set_defaults(func=run)
 
 
 def run(args: argparse.Namespace) -> None:
     output_dir = args.output_dir.resolve()
     metrics_csv = output_dir / "metrics.csv"
+    train_log = output_dir / "train.log"
 
     if args.summary or not args.tensorboard:
         _print_metrics_summary(metrics_csv)
+        if args.tail_log:
+            _print_log_tail(train_log, tail=args.tail_log)
 
     if not args.tensorboard:
         if not args.summary:
