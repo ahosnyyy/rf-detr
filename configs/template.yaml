@@ -16,7 +16,7 @@ model:
 dataset_dir: dataset/my_task
 output_dir: output/my_task_large
 
-epochs: 50
+epochs: 100  # RF-DETR default; early stopping usually finishes sooner
 batch_size: 16
 grad_accum_steps: 2
 auto_batch_target_effective: 32  # per-device effective batch (16 × 2)
@@ -27,7 +27,7 @@ num_workers: 8
 
 aug_preset: aggressive
 early_stopping: true
-early_stopping_patience: 20
+early_stopping_patience: 15  # RF-DETR docs recommendation
 early_stopping_min_delta: 0.001
 skip_best_epochs: 3
 checkpoint_interval: 10
@@ -39,3 +39,4 @@ log_file: train.log  # mirror console output; metrics.csv is always written too
 # wandb: true
 # project: my-project
 # run: exp-01
+# run_test: true
