@@ -1,25 +1,40 @@
 # Copy and edit for a new dataset / experiment.
 #
+# Tuned for NVIDIA RTX 5090 (32 GB GDDR7) + RFDETRLarge @ 704px.
+# Refine batch size on your machine:
+#   uv run rfdetr-tools fit-gpu --config configs/template.yaml --targets 16,32,64
+#
 # model.variant options: RFDETRNano, RFDETRSmall, RFDETRMedium, RFDETRLarge
 # aug_preset options: conservative, aggressive, aerial, industrial
 
 model:
-  variant: RFDETRSmall
-  resolution: 512  # optional; defaults to variant default (see table in README)
-  gradient_checkpointing: false
-  pretrain_weights: rf-detr-small.pth
+  variant: RFDETRLarge
+  resolution: 704  # RF-DETR default for Large (704×704); must be divisible by 32
+  gradient_checkpointing: false  # 32 GB VRAM: keep off for speed; enable if OOM
+  pretrain_weights: rf-detr-large-2026.pth
 
 dataset_dir: dataset/my_task
-output_dir: output/my_task_small
+output_dir: output/my_task_large
 
 epochs: 50
-batch_size: 4
-grad_accum_steps: 4
+batch_size: 16
+grad_accum_steps: 2
+auto_batch_target_effective: 32  # per-device effective batch (16 × 2)
 lr: 1.0e-4
 lr_encoder: 1.5e-4
 device: cuda
+num_workers: 8
 
 aug_preset: aggressive
 early_stopping: true
+early_stopping_patience: 20
+early_stopping_min_delta: 0.001
+skip_best_epochs: 3
+checkpoint_interval: 10
+
 tensorboard: true
-progress_bar: tqdm
+progress_bar: rich
+
+# wandb: true
+# project: my-project
+# run: exp-01
