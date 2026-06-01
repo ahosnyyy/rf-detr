@@ -1,0 +1,25 @@
+# Copy and edit for a new dataset / experiment.
+#
+# model.variant options: RFDETRNano, RFDETRSmall, RFDETRMedium, RFDETRLarge
+# aug_preset options: conservative, aggressive, aerial, industrial
+
+model:
+  variant: RFDETRSmall
+  resolution: 512  # optional; defaults to variant default (see table in README)
+  gradient_checkpointing: false
+  pretrain_weights: rf-detr-small.pth
+
+dataset_dir: dataset/my_task
+output_dir: output/my_task_small
+
+epochs: 50
+batch_size: 4
+grad_accum_steps: 4
+lr: 1.0e-4
+lr_encoder: 1.5e-4
+device: cuda
+
+aug_preset: aggressive
+early_stopping: true
+tensorboard: true
+progress_bar: tqdm

@@ -1,0 +1,31 @@
+# Generated from fit-gpu sweep on RTX 3050 4 GB (2026-06-01).
+# All probed scenarios (target 8/16, gc on/off) passed at batch_size=2.
+# Recommended: target 8 (fastest). For effective batch 16, use grad_accum_steps: 8.
+
+model:
+  variant: RFDETRSmall
+  resolution: 512  # RF-DETR default for Small (512×512); must be divisible by 32
+  gradient_checkpointing: false
+  pretrain_weights: rf-detr-small.pth
+
+dataset_dir: dataset/egyptian_id
+output_dir: output/egyptian_id_small
+
+epochs: 50
+batch_size: 2
+grad_accum_steps: 4
+auto_batch_target_effective: 8
+lr: 1.0e-4
+lr_encoder: 1.5e-4
+device: cuda
+
+aug_preset: aggressive
+early_stopping: true
+early_stopping_patience: 15
+early_stopping_min_delta: 0.001
+skip_best_epochs: 3
+checkpoint_interval: 10
+
+tensorboard: true
+progress_bar: tqdm
+project: egyptian-id-detection

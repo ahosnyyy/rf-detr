@@ -1,0 +1,37 @@
+# OOM on 4 GB GPU? Run a GPU fit sweep first:
+#   uv run rfdetr-tools fit-gpu --config configs/egyptian_id_small.yaml --output-config configs/egyptian_id_small_fitted.yaml
+# Or set batch_size: auto below (probed once at train time; fit-gpu tries more combinations).
+
+model:
+  variant: RFDETRSmall
+  resolution: 512  # RF-DETR default for Small (512×512); must be divisible by 32
+  gradient_checkpointing: false
+  pretrain_weights: rf-detr-small.pth
+
+dataset_dir: dataset/egyptian_id
+output_dir: output/egyptian_id_small
+
+epochs: 50
+batch_size: 4
+grad_accum_steps: 4
+auto_batch_target_effective: 16
+lr: 1.0e-4
+lr_encoder: 1.5e-4
+device: cuda
+
+aug_preset: aggressive
+early_stopping: true
+early_stopping_patience: 15
+early_stopping_min_delta: 0.001
+skip_best_epochs: 3
+checkpoint_interval: 10
+
+tensorboard: true
+progress_bar: tqdm
+project: egyptian-id-detection
+
+# wandb: true
+# run_test: true
+
+# OOM on 4 GB GPU? Set gradient_checkpointing: true under model:, run fit-gpu, or:
+#   uv run rfdetr-tools train --config configs/egyptian_id_small.yaml --gradient-checkpointing

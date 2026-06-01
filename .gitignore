@@ -1,0 +1,85 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+dist/
+build/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# uv
+.uv/
+
+# Test / lint / type check
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+coverage.xml
+.hypothesis/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Training runs (checkpoints, logs, exports, TensorBoard)
+output/**/*
+!output/**/.gitkeep
+
+# Pretrained weights (auto-downloaded into checkpoints/)
+checkpoints/*
+!checkpoints/.gitkeep
+
+# Model artifacts (anywhere in the repo)
+*.onnx
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.engine
+
+# Dataset media (keep annotations, scripts, and docs)
+dataset/**/*.jpg
+dataset/**/*.jpeg
+dataset/**/*.png
+dataset/**/*.webp
+dataset/**/*.bmp
+dataset/**/*.tif
+dataset/**/*.tiff
+dataset/**/*.gif
+dataset/**/*.mp4
+dataset/**/*.avi
+dataset/**/*.zip
+dataset/**/*.tar
+dataset/**/*.tar.gz
+
+# Experiment tracking
+wandb/
+mlruns/
+lightning_logs/
+events.out.tfevents.*
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+
+# Local caches (if created inside the project)
+.roboflow/
+.cache/
